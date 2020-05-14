@@ -18,7 +18,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
+#  
 
 include_recipe 'nodejs::repo' if node['nodejs']['install_repo']
 
@@ -29,5 +29,12 @@ unless node['nodejs']['packages']
 end
 
 node['nodejs']['packages'].each do |node_pkg|
-  package node_pkg
+  case node['platform_family']
+  when 'debian'
+    package node_pkg
+  when 'rhel', 'amazon'
+    package node_pkg do
+      flush_cache [ :before ]
+    end
+  end 
 end
